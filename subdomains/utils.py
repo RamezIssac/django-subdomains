@@ -1,4 +1,5 @@
 import functools
+
 try:
     from urlparse import urlunparse
 except ImportError:
@@ -18,6 +19,7 @@ def current_site_domain():
         domain = domain.replace(prefix, '', 1)
 
     return domain
+
 
 get_domain = current_site_domain
 
@@ -39,7 +41,7 @@ def urljoin(domain, path=None, scheme=None):
 
 
 def reverse(viewname, subdomain=None, scheme=None, args=None, kwargs=None,
-        current_app=None):
+            current_app=None):
     """
     Reverses a URL from the given parameters, in a similar fashion to
     :meth:`django.core.urlresolvers.reverse`.
@@ -51,14 +53,15 @@ def reverse(viewname, subdomain=None, scheme=None, args=None, kwargs=None,
     :param kwargs: named arguments used for URL reversing
     :param current_app: hint for the currently executing application
     """
-    urlconf = settings.SUBDOMAIN_URLCONFS.get(subdomain, settings.ROOT_URLCONF)
+    from . import app_settings
+    urlconf = app_settings.SUBDOMAIN_URLS_FUNCTION(subdomain, settings.ROOT_URLCONF)
 
     domain = get_domain()
     if subdomain is not None:
         domain = '%s.%s' % (subdomain, domain)
 
     path = simple_reverse(viewname, urlconf=urlconf, args=args, kwargs=kwargs,
-        current_app=current_app)
+                          current_app=current_app)
     return urljoin(domain, path, scheme=scheme)
 
 
@@ -70,3 +73,7 @@ secure_reverse = functools.partial(reverse, scheme='https')
 
 #: :func:`reverse` bound to be relative to the current scheme
 relative_reverse = functools.partial(reverse, scheme='')
+
+
+def get_subdomain_urls(subdomain, default=None):
+    return settings.SUBDOMAIN_URLCONFS.get(subdomain, default)

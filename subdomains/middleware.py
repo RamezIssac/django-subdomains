@@ -7,7 +7,7 @@ from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 
 from subdomains.utils import get_domain
-
+from . import app_settings
 
 logger = logging.getLogger(__name__)
 lower = operator.methodcaller('lower')
@@ -60,7 +60,7 @@ class SubdomainURLRoutingMiddleware(SubdomainMiddleware):
         subdomain = getattr(request, 'subdomain', UNSET)
 
         if subdomain is not UNSET:
-            urlconf = settings.SUBDOMAIN_URLCONFS.get(subdomain)
+            urlconf = app_settings.SUBDOMAIN_URLS_FUNCTION(subdomain)
             if urlconf is not None:
                 logger.debug("Using urlconf %s for subdomain: %s",
                     repr(urlconf), repr(subdomain))
