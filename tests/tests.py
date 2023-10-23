@@ -1,12 +1,13 @@
 import functools
-import mock
 import warnings
+from unittest import mock
+
 try:
     import urlparse
 except ImportError:  # Python 3
     from urllib import parse as urlparse
 
-from django.core.urlresolvers import NoReverseMatch, set_urlconf
+from django.urls import NoReverseMatch, set_urlconf
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -24,7 +25,7 @@ def prefix_values(dictionary, prefix):
 
 class SubdomainTestMixin(object):
     DOMAIN = 'example.com'
-    URL_MODULE_PATH = 'subdomains.tests.urls'
+    URL_MODULE_PATH = 'tests.urls'
 
     def setUp(self):
         super(SubdomainTestMixin, self).setUp()
@@ -68,7 +69,9 @@ class SubdomainTestMixin(object):
 class SubdomainMiddlewareTestCase(SubdomainTestMixin, TestCase):
     def setUp(self):
         super(SubdomainMiddlewareTestCase, self).setUp()
-        self.middleware = SubdomainMiddleware()
+        def view_view(request):
+            return request
+        self.middleware = SubdomainMiddleware(view_view)
 
     def test_subdomain_attribute(self):
         def subdomain(subdomain):
@@ -137,7 +140,9 @@ class SubdomainMiddlewareTestCase(SubdomainTestMixin, TestCase):
 class SubdomainURLRoutingTestCase(SubdomainTestMixin, TestCase):
     def setUp(self):
         super(SubdomainURLRoutingTestCase, self).setUp()
-        self.middleware = SubdomainURLRoutingMiddleware()
+        def view_func(request):
+            pass
+        self.middleware = SubdomainURLRoutingMiddleware(view_func)
 
     def test_url_routing(self):
         def urlconf(subdomain):
