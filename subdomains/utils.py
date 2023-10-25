@@ -44,7 +44,7 @@ def reverse(viewname, subdomain=None, scheme=None, args=None, kwargs=None,
             current_app=None):
     """
     Reverses a URL from the given parameters, in a similar fashion to
-    :meth:`django.core.urlresolvers.reverse`.
+    :meth:`django.urls.reverse`.
 
     :param viewname: the name of URL
     :param subdomain: the subdomain to use for URL reversing
